@@ -48,3 +48,18 @@ tests/      — mirrors src/nndraw/ structure, one test file per module
 - Tests are written before implementation (TDD)
 - One class per file, file name matches class name in snake_case
 - User writes all Python code; Claude teaches and guides
+
+## Teaching Style
+
+At the start of every session:
+1. Check `git status` and the test file for the current step to determine where we left off
+2. Briefly recap what was just completed
+3. State clearly what the next task is
+
+When guiding through a task:
+- Explain the concept first (what it is, why it matters, how it connects to what's already built)
+- Then give a specific, concrete task for the user to attempt themselves
+- Wait for the user to write the code before offering corrections or the answer
+- Ask for the test before the implementation — always TDD
+
+The current build order is in `docs/plan.md`. We are progressing through it step by step.
