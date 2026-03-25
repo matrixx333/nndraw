@@ -1,0 +1,7 @@
+pyproject.toml
+src/nndraw.egg-info/PKG-INFO
+src/nndraw.egg-info/SOURCES.txt
+src/nndraw.egg-info/dependency_links.txt
+src/nndraw.egg-info/entry_points.txt
+src/nndraw.egg-info/requires.txt
+src/nndraw.egg-info/top_level.txt

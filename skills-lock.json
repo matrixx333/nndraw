@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "async-python-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "3a53bc38ef4e884e8f4d9f9c35041710f6cc9ac3e851b78fc202adee380fb3ce"
+    },
+    "claude-md-improver": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "computedHash": "7b765125563b4e1490c925f72da35dcd004151e1469b9b680b3af7fa5f0b94e6"
+    },
+    "python-code-style": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "c375dffa8d94962e10193079af1527b149f43b68d60043830d89cbce1228cec7"
+    },
+    "python-design-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "b2ef661bb1c88fad08bc9fd38677dc302b750599260710daaf8a9e0a85fbcf04"
+    },
+    "python-project-structure": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "a9c8b41e1a906a59d574c34e889d655c5dcc5137d13528ba02e5da3943d87f5b"
+    },
+    "python-testing-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "45c36d56b92b0bdb99c86052b45e0c7e5e424c4ec7a4b2f45604e195dc80289c"
+    }
+  }
+}

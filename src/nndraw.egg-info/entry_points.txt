@@ -1,0 +1,2 @@
+[console_scripts]
+nndraw = nndraw.__main__:main
