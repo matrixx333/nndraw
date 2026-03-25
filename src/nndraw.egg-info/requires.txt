@@ -1,6 +1,0 @@
-pygame-ce>=2.4
-qdrant-client>=1.9
-
-[dev]
-pytest>=8
-pytest-cov

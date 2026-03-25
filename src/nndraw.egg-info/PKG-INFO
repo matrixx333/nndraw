@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: nndraw
-Version: 0.1.0
-Requires-Python: >=3.13
-Requires-Dist: pygame-ce>=2.4
-Requires-Dist: qdrant-client>=1.9
-Provides-Extra: dev
-Requires-Dist: pytest>=8; extra == "dev"
-Requires-Dist: pytest-cov; extra == "dev"
