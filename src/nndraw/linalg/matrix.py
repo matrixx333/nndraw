@@ -1,3 +1,4 @@
+from __future__ import annotations
 from nndraw.linalg.vector import Vector
 
 class Matrix:
@@ -6,7 +7,7 @@ class Matrix:
             raise ValueError("All rows mut have the same number of columns")
         self._rows = rows
 
-    def transpose(self) -> "Matrix":
+    def transpose(self) -> Matrix:
         """
         Transpose: flip the matrix over its diagonal so rows become columns.
 
@@ -16,7 +17,7 @@ class Matrix:
         """
         return Matrix([[self._rows[row][col] for row in range(self.rows)] for col in range(self.cols)])
 
-    def multiply(self, other: "Matrix") -> "Matrix":
+    def multiply(self, other: Matrix) -> Matrix:
         """
         Matrix multiplication: C[i][j] = dot(row i of self, column j of other)
 
@@ -44,7 +45,7 @@ class Matrix:
             return self._rows[row][col]
         return self._rows[index]
 
-    def __mul__(self, vector: "Vector") -> "Vector":
+    def __mul__(self, vector: Vector) -> Vector:
         """
         Matrix-vector multiplication: output[i] = dot(row i of self, vector)
 
@@ -56,3 +57,9 @@ class Matrix:
 
     def __repr__(self) -> str:
         return f"Matrix({self._rows})"
+    
+    def __eq__(self, other: Matrix) -> bool:
+        pairs = zip(self._rows, other._rows)
+        return all(a == b for row_a, row_b in pairs for a, b in zip(row_a, row_b))
+
+

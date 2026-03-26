@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 class Vector:
     def __init__(self, components: list[float]):
         self._components = list(components)
 
-    def dot(self, other: "Vector") -> float:
+    def dot(self, other: Vector) -> float:
         """
         Dot product: a·b = a₁b₁ + a₂b₂ + ... + aₙbₙ
 
@@ -14,13 +16,17 @@ class Vector:
         result = [a * b for a, b in pairs]
         return sum(result)
 
+    def times(self, other: Vector) -> Vector:
+        pairs = zip(self._components, other._components)
+        return Vector([a * b for a, b in pairs])
+
     def __getitem__(self, index: int) -> float:
         return self._components[index]
 
     def __len__(self) -> int:
         return len(self._components)
 
-    def __add__(self, other: "Vector") -> "Vector":
+    def __add__(self, other: Vector) -> Vector:
         """
         Vector addition: [a₁+b₁, a₂+b₂, ..., aₙ+bₙ]
 
@@ -31,7 +37,7 @@ class Vector:
         pairs = zip(self._components, other._components)
         return Vector([a + b for a, b in pairs])
 
-    def __mul__(self, scalar: float) -> "Vector":
+    def __mul__(self, scalar: float) -> Vector:
         """
         Scalar multiplication: [a₁·s, a₂·s, ..., aₙ·s]
 
@@ -43,3 +49,7 @@ class Vector:
 
     def __repr__(self) -> str:
         return f"Vector({self._components})"
+    
+    def __eq__(self, other: Vector) -> bool:
+        pairs = zip(self._components, other._components)
+        return all(a == b for a, b in pairs)

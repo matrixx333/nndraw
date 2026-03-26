@@ -65,7 +65,7 @@ python-project/
 │       ├── db/               # Qdrant repository
 │       │   ├── __init__.py
 │       │   └── point_store.py
-│       └── viz/              # Pygame visualization
+│       └── ui/              # Pygame visualization
 │           ├── __init__.py
 │           └── canvas.py
 ├── tests/
@@ -75,7 +75,7 @@ python-project/
 ├── pyproject.toml
 ├── CLAUDE.md                 # Update after setup
 └── docs/
-    └── project-goals.md
+    └── goals.md
 ```
 
 ---
@@ -111,7 +111,7 @@ Implement (test-first): `Network(layer_sizes)`, `predict(inputs)`, `train(inputs
 Teach: Qdrant Python client, collections, upsert, search
 Implement: `PointStore`, `add_point(x, y, label)`, `get_all()`, `find_nearest(x, y, k)`
 
-### Step 8 — `viz/canvas.py`
+### Step 8 — `ui/canvas.py`
 Teach: Pygame event loop, surface drawing, threading for background training
 Implement: interactive canvas that ties all layers together
 

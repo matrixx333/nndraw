@@ -29,3 +29,8 @@ def test_vector_dot_product():
     a = Vector([1.0, 2.0, 3.0])
     b = Vector([4.0, 5.0, 6.0])
     assert a.dot(b) == 32.0
+
+def test_vector_times_product():
+    a = Vector([1.0, 2.0, 3.0])
+    b = Vector([4.0, 5.0, 6.0])
+    assert a.times(b) == Vector([4.0, 10.0, 18.0])

@@ -42,6 +42,17 @@ src/nndraw/
 tests/      — mirrors src/nndraw/ structure, one test file per module
 ```
 
+## Skills
+
+Below is a list of skills you have access to: 
+
+- async-python-patterns
+- claude-md-improver
+- python-code-style
+- python-design-patterns
+- python-project-structure
+- python-testing-patterns
+
 ## Conventions
 
 - All linear algebra is hand-rolled — never import numpy/scipy for math
