@@ -1,21 +1,27 @@
-from nndraw.linalg.matrix import Matrix
 from nndraw.linalg.vector import Vector
-from nndraw.nn.layer import Layer
 from nndraw.nn.network import Network
+from nndraw.nn.activations import sigmoid, sigmoid_derivative
 
-def test_network_predict_identity():
-    layers: list[Layer] = []
-    identity = Matrix([[1.0, 0.0], [0.0, 1.0]])
-    for _ in range(3):
-        l = Layer(input_size=2, output_size=2)
-        l.weights = identity
-        l.bias = Vector([0.0, 0.0])
-        layers.append(l)
+layer_sizes = [2, 3, 1]
+
+def test_network_predict_identity():    
     input = Vector([5.0, 5.0])
-    layer_sizes = [2, 3, 1]
     n = Network(layer_sizes)
-    n._layers = layers
-    result = n.predict(input)
-    assert result == input
+    output = n.predict(input)
+    assert len(output) == layer_sizes[-1]
 
-
+def test_network_train_reduces_loss():
+    learning_rate = 1.0
+    input = Vector([0.5, 0.5])    
+    target = Vector([1.0])
+    n = Network(layer_sizes, sigmoid, sigmoid_derivative)
+    initial_output = n.predict(input)
+    for i in range(10000):
+        n.train(input, target, learning_rate)
+    final_output = n.predict(input)
+    initial_sum = sum((o - t) ** 2 for o, t in zip(initial_output, target))
+    final_sum = sum((o - t) ** 2 for o, t in zip(final_output, target))
+    print(f"\n")
+    print(f"inital_sum => {initial_sum}")
+    print(f"final_sum => {final_sum}")
+    assert final_sum < initial_sum

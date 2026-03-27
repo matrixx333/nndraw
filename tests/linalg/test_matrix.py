@@ -19,6 +19,12 @@ def test_matrix_transpose():
     assert result[0][0] == 1
     assert result[2][1] == 6
 
+def test_matrix_subtraction():
+    m1 = Matrix([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    m2 = Matrix([[4.0, 5.0, 6.0], [1.0, 2.0, 3.0]])
+    result = m1 - m2
+    assert result == Matrix([[-3, -3, -3], [3, 3, 3]])
+
 def test_matrix_multiply_vector():
     m = Matrix([[1.0, 2.0], [3.0, 4.0]])
     v = Vector([1.0, 1.0])
@@ -29,7 +35,7 @@ def test_matrix_multiply_vector():
 def test_matrix_multiplication():
     m1 = Matrix([[1.0, 2.0], [3.0, 4.0]])
     m2 = Matrix([[5.0, 6.0], [7.0, 8.0]])
-    result = m1.multiply(m2)
+    result = m1 * m2
     assert result[0][0] == 19.0
     assert result[0][1] == 22.0
     assert result[1][0] == 43.0

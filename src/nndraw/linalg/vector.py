@@ -1,6 +1,14 @@
 from __future__ import annotations
 
 class Vector:
+    """
+    An ordered list of floats representing a mathematical vector.
+
+    Supports element-wise addition, subtraction, and multiplication, scalar
+    scaling, dot product, and iteration. Used throughout the neural network as
+    inputs, outputs, biases, and gradient signals.
+    """
+
     def __init__(self, components: list[float]):
         self._components = list(components)
 
@@ -15,10 +23,6 @@ class Vector:
         pairs = zip(self._components, other._components)
         result = [a * b for a, b in pairs]
         return sum(result)
-
-    def times(self, other: Vector) -> Vector:
-        pairs = zip(self._components, other._components)
-        return Vector([a * b for a, b in pairs])
 
     def __getitem__(self, index: int) -> float:
         return self._components[index]
@@ -36,16 +40,29 @@ class Vector:
         """
         pairs = zip(self._components, other._components)
         return Vector([a + b for a, b in pairs])
+    
+    def __sub__(self, other: Vector) -> Vector:
+        """Element-wise subtraction. Used in gradient descent to subtract scaled gradients from weights."""
+        pairs = zip(self._components, other._components)
+        return Vector([a - b for a, b in pairs])
 
-    def __mul__(self, scalar: float) -> Vector:
+    def __mul__(self, other) -> Vector:
         """
-        Scalar multiplication: [a₁·s, a₂·s, ..., aₙ·s]
+        Element-wise multiplication with another Vector, or scalar scaling with a float.
 
-        Stretches or shrinks every component by the same factor. Direction stays
-        the same (or reverses if s < 0); only the magnitude changes. Used in
-        backpropagation when scaling gradients by a learning rate.
+        Vector * Vector → each component multiplied by its counterpart.
+        Vector * float  → every component scaled by the scalar.
+        Used in backpropagation to apply the activation derivative element-wise.
         """
-        return Vector([a * scalar for a in self._components])
+        if isinstance(other, Vector):
+            pairs = zip(self._components, other._components)
+            return Vector([a * b for a, b in pairs])
+        else: 
+            return Vector([a * other for a in self._components])
+
+    def __rmul__(self, other: float) -> Vector:
+        """Allows float * Vector in addition to Vector * float."""
+        return self.__mul__(other);
 
     def __repr__(self) -> str:
         return f"Vector({self._components})"
@@ -53,3 +70,6 @@ class Vector:
     def __eq__(self, other: Vector) -> bool:
         pairs = zip(self._components, other._components)
         return all(a == b for a, b in pairs)
+
+    def __iter__(self):
+        return iter(self._components)
