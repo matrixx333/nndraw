@@ -7,15 +7,14 @@ def test_add_point_stores_point():
     label = 0
     p = Vector([1.0, 3.0])
     ps = PointStore()
-    ps.clear()
     ps.add_point(p, label)
     points = ps.get_all()
     assert len(points) == 1
+    ps.clear()
 
 def test_get_all_returns_all_points():
     label = 0
     ps = PointStore()
-    ps.clear()
     for _ in range(10):
         x = random.uniform(1, 10)
         y = random.uniform(1, 10)
@@ -23,11 +22,11 @@ def test_get_all_returns_all_points():
         ps.add_point(p, label)
     points = ps.get_all()
     assert len(points) == 10
+    ps.clear()
 
 def test_find_nearest_returns_closest_points():
     label = 0
     ps = PointStore()
-    ps.clear()
     for _ in range(8):
         x = random.uniform(1, 10)
         y = random.uniform(1, 10)
@@ -43,3 +42,4 @@ def test_find_nearest_returns_closest_points():
     result_vectors = [r[0] for r in results]
     assert p1 in result_vectors
     assert p2 in result_vectors
+    ps.clear()

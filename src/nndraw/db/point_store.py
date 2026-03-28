@@ -1,7 +1,12 @@
 from typing import cast
 from nndraw.linalg.vector import Vector
 from qdrant_client import QdrantClient
-from qdrant_client.models import VectorParams, Distance, Record, PointStruct 
+from qdrant_client.models import (
+    VectorParams, 
+    Distance, 
+    Record, 
+    PointStruct 
+)
 
 class PointStore:
     def __init__(self):
@@ -13,7 +18,10 @@ class PointStore:
         _create_collection(self)
 
     def clear(self):
-        self._client.delete_collection(self._collection_name)
+        try:
+            self._client.delete_collection(self._collection_name)
+        except Exception as e:
+            print(f"error deleting collection: {e}")
         _create_collection(self)
     
     def add_point(self, p: Vector, label: int):
@@ -75,11 +83,8 @@ class PointStore:
         for r in search_result.points:
             if r.payload is not None:
                 label = r.payload["label"]
-            # label = 0
-            print(r)
             v = Vector(cast(list[float], r.vector))
             results.append((v, label))
-
 
         return results
     
