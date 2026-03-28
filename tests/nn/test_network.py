@@ -19,9 +19,9 @@ def test_network_train_reduces_loss():
     for i in range(10000):
         n.train(input, target, learning_rate)
     final_output = n.predict(input)
-    initial_sum = sum((o - t) ** 2 for o, t in zip(initial_output, target))
-    final_sum = sum((o - t) ** 2 for o, t in zip(final_output, target))
-    print(f"\n")
-    print(f"inital_sum => {initial_sum}")
-    print(f"final_sum => {final_sum}")
+    initial_sum = mean_squared_error(initial_output, target)
+    final_sum = mean_squared_error(final_output, target)    
     assert final_sum < initial_sum
+
+def mean_squared_error(output: Vector, target: Vector) -> float:
+    return sum((o - t) ** 2 for o, t in zip(output, target))

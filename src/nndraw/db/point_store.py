@@ -1,0 +1,91 @@
+from typing import cast
+from nndraw.linalg.vector import Vector
+from qdrant_client import QdrantClient
+from qdrant_client.models import VectorParams, Distance, Record, PointStruct 
+
+class PointStore:
+    def __init__(self):
+        self._collection_name = "points"
+        client = QdrantClient(host="localhost", port=6333)
+        self._client = client
+        self._id = 0
+
+        _create_collection(self)
+
+    def clear(self):
+        self._client.delete_collection(self._collection_name)
+        _create_collection(self)
+    
+    def add_point(self, p: Vector, label: int):
+        self._id += 1
+        payload = {
+            "label": label
+        }
+        point_struct = PointStruct(
+            id=self._id,
+            payload=payload,
+            vector=list(p)
+        )
+        points = [point_struct]
+
+        self._client.upsert(
+            collection_name=self._collection_name,
+            points=points
+        )
+    
+    def get_all(self) -> list[Vector]: 
+        all_records: list[Record] = []
+        all_vectors: list[Vector] = []
+        scroll_offset = None
+
+        while True:
+            points, offset = self._client.scroll(
+                  collection_name=self._collection_name,
+                  with_payload=True,
+                  with_vectors=True,
+                  limit=100,
+                  offset=scroll_offset
+            )
+            all_records.extend(points)
+
+            if offset is None: 
+                break
+
+        for r in all_records:
+            v = Vector(cast(list[float], r.vector))
+            all_vectors.append(v)
+
+        return all_vectors
+    
+    def find_nearest(
+            self, 
+            query_vector: Vector, 
+            k: int
+        ) -> list[tuple[Vector, int]]:
+        results: list[tuple[Vector, int]] = []
+
+        search_result = self._client.query_points(
+            collection_name=self._collection_name,
+            query=list(query_vector),
+            limit=k,
+            with_payload=True,
+            with_vectors=True
+        )
+
+        for r in search_result.points:
+            if r.payload is not None:
+                label = r.payload["label"]
+            # label = 0
+            print(r)
+            v = Vector(cast(list[float], r.vector))
+            results.append((v, label))
+
+
+        return results
+    
+def _create_collection(self):
+    if not self._client.collection_exists(self._collection_name):
+            self._client.create_collection(
+                collection_name=self._collection_name,
+                vectors_config=VectorParams(size=2, distance=Distance.EUCLID)
+            )

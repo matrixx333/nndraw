@@ -7,9 +7,10 @@ class Layer:
     """
     A single fully-connected layer in a neural network.
 
-    Each neuron in this layer is connected to every input. The layer holds a
-    weight matrix and a bias vector, and optionally applies an activation
-    function to introduce non-linearity.
+    Each neuron in this layer is connected to every input — represented as a
+    row in the weight matrix, where each element is the connection strength to
+    one input. The layer holds a weight matrix and a bias vector, and optionally
+    applies an activation function to introduce non-linearity.
 
     During training, the layer stores intermediate values from the forward pass
     so that backward() can compute gradients and update the weights in-place.
