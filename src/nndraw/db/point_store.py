@@ -89,8 +89,9 @@ class PointStore:
         return results
     
 def _create_collection(self):
+    vector_params = VectorParams(size=2, distance=Distance.EUCLID)
     if not self._client.collection_exists(self._collection_name):
             self._client.create_collection(
                 collection_name=self._collection_name,
-                vectors_config=VectorParams(size=2, distance=Distance.EUCLID)
+                vectors_config=vector_params
             )
