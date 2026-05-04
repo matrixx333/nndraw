@@ -53,7 +53,11 @@ class Canvas:
                 normalized_input = self._normalize_input(x, y)
                 output = self._network.predict(Vector(normalized_input))
                 color = self._lerp_color(output)
-                pygame.draw.rect(screen, color, (x, y, _config.grid_size, _config.grid_size))
+                pygame.draw.rect(
+                    screen, 
+                    color, 
+                    (x, y, _config.grid_size, _config.grid_size)
+                )
 
     def _add_vector(self, event: pygame.Event) -> None:
         label = None

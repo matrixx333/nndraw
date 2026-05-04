@@ -1,3 +1,5 @@
+import pytest
+
 from nndraw.linalg.matrix import Matrix
 from nndraw.linalg.vector import Vector
 
@@ -40,3 +42,20 @@ def test_matrix_multiplication():
     assert result[0][1] == 22.0
     assert result[1][0] == 43.0
     assert result[1][1] == 50.0
+
+def test_determinant():
+    m = Matrix([[1.0, 2.0], [3.0, 4.0]])
+    result = m.determinant()
+    assert result == -2.0 
+
+def test_inverse():
+    m1 = Matrix([[1.0, 2.0], [3.0, 4.0]])
+    result = m1.inverse()
+    m2 = Matrix([[-2.0, 1.0],[1.5, -0.5]])
+    assert result == m2
+
+def test_singular_matrix_inverse():
+    m = Matrix([[1.0, 2.0], [1.0, 2.0]])
+    with pytest.raises(ValueError):
+        m.inverse()
+    

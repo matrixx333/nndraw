@@ -13,7 +13,7 @@ class Matrix:
 
     def __init__(self, rows: list[list[float]]):
         if len(set(len(row) for row in rows)) > 1:
-            raise ValueError("All rows mut have the same number of columns")
+            raise ValueError("All rows must have the same number of columns")
         self._rows = rows
 
     def transpose(self) -> Matrix:
@@ -25,6 +25,23 @@ class Matrix:
         backpropagation to route gradients backwards through a layer (Wᵀ·δ).
         """
         return Matrix([[self._rows[row][col] for row in range(self.rows)] for col in range(self.cols)])
+    
+    def determinant(self):
+        are_equal = self.cols == self.rows;
+        if not are_equal:
+            raise ValueError("Cannot find the determinate of a non-square matrix.")
+        if not self.cols == 2:
+                raise NotImplementedError()
+        (a, b), (c, d) = self._rows
+        return (a * d) - (b * c)
+    
+    def inverse(self):
+        det = self.determinant()
+        if det == 0:
+            raise ValueError("A singular matrix has no inverse")
+        (a, b), (c, d) = self._rows
+        m = Matrix([[d, -b], [-c, a]])
+        return (1 / self.determinant()) * m
 
     @property
     def rows(self) -> int:
