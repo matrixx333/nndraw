@@ -32,3 +32,39 @@ def relu_derivative(x: float) -> float:
     to compute weight adjustments in hidden layers.
     """
     return 1 if x > 0 else 0.0
+
+def tanh(x: float) -> float:
+    """
+    Maps any value to (-1, 1). Zero-centered, unlike sigmoid — preferred for hidden layers
+    because it helps gradients flow symmetrically during backpropagation.
+
+    tanh(0) = 0, large positive → 1, large negative → -1.
+    """
+    e_x = math.exp(x)
+    e_neg_x = math.exp(-x)
+    return (e_x - e_neg_x) / (e_x + e_neg_x)
+
+def tanh_derivative(x: float) -> float:
+    """
+    Slope of tanh at x. Used during backpropagation to compute weight adjustments.
+
+    tanh_derivative(0) = 1. Approaches 0 for large |x| (vanishing gradient).
+    """
+    t = tanh(x)
+    return 1 - (t ** 2)
+
+def leaky_relu(x: float, alpha: float = 0.01) -> float:
+    """
+    Like relu, but allows a small slope (alpha) for negative inputs instead of clamping to zero.
+    Fixes the "dying ReLU" problem where neurons with always-negative inputs stop updating entirely.
+
+    Returns x for positive inputs, alpha * x for negative inputs.
+    """
+    return x if x > 0 else alpha * x
+    
+def leaky_relu_derivative(x: float, alpha: float = 0.01) -> float:
+    """
+    Slope of leaky_relu at x. Returns 1 for positive inputs (gradient passes through),
+    alpha for negative inputs (small gradient still flows). Used during backpropagation.
+    """
+    return 1 if x > 0 else alpha
