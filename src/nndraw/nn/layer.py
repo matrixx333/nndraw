@@ -23,14 +23,19 @@ class Layer:
             activation: Callable[[float], float] | None = None,
             activation_derivative: Callable[[float], float] | None = None
         ):
+        """
+        activation_derivative must accept the pre-activation value z (the raw
+        weighted sum W·x + b), not the post-activation value a = activation(z).
+        For sigmoid, write it as σ(z)·(1 − σ(z)), not as a·(1 − a).
+        """
         self._activation = activation
         self._activation_derivative = activation_derivative
         self.weights = Matrix([[random.uniform(-1, 1) for _ in range(input_size)] for _ in range(output_size)])
         self.bias = Vector([0.0 for _ in range(output_size)])
-        self._input = Vector([])
-        self._last_z = Vector([])
-        self._grad_bias = Vector([])
-        self._grad_weights = Matrix([])
+        self._input: Vector | None = None
+        self._last_z: Vector | None = None
+        self._grad_bias: Vector | None = None
+        self._grad_weights: Matrix | None = None
 
     def forward(self, input: Vector) -> Vector:
         """
