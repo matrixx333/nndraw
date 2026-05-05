@@ -1,6 +1,7 @@
 from typing import Any
 
 import pygame
+import threading
 
 from nndraw.linalg.vector import Vector
 from nndraw.nn.network import Network
@@ -17,6 +18,7 @@ class Canvas:
             sigmoid, 
             sigmoid_derivative
         )
+        self._lock = threading.Lock()
 
     def run(self):
         pygame.init()
@@ -25,6 +27,8 @@ class Canvas:
             (_config.width, _config.height)
         )
         clock = pygame.time.Clock()
+        thread = threading.Thread(target=self._training_loop, daemon=True)
+        thread.start()
         running = True
 
         while running:
@@ -37,10 +41,10 @@ class Canvas:
             screen.fill("#181818ff")
 
             # RENDER GAME HERE
-            self._train()
             self._draw_background(screen)
-            for p in self._points:
-                self._draw_circle(screen, p)
+            with self._lock:
+                for p in self._points:
+                    self._draw_circle(screen, p)
             pygame.display.flip()
 
             clock.tick(_config.fps)
@@ -70,14 +74,16 @@ class Canvas:
             label = 0
             normalized_input = self._normalize_input(x, y)
             v = Vector(normalized_input);
-            self._points.append((v, label));
+            with self._lock:
+                self._points.append((v, label));
         elif is_right_click:
             print(event.pos)
             x, y = event.pos
             label = 1
             normalized_input = self._normalize_input(x, y)
             v = Vector(normalized_input);
-            self._points.append((v, label));
+            with self._lock:
+                self._points.append((v, label));
 
     def _draw_circle(
             self, 
@@ -112,6 +118,12 @@ class Canvas:
         return (x, y)
 
     def _train(self) -> None:
-        for v, label in self._points:
+        with self._lock:
+            points_snapshot = list(self._points)
+        for v, label in points_snapshot:
             target = Vector([float(label)])
             self._network.train(v, target, learning_rate=_config.learning_rate)
+
+    def _training_loop(self) -> None:
+        while True:
+            self._train()
