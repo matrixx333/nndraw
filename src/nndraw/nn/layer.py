@@ -37,6 +37,14 @@ class Layer:
         self._grad_bias: Vector | None = None
         self._grad_weights: Matrix | None = None
 
+    def predict(self, input: Vector) -> Vector:
+        """
+        Pure forward pass — computes the layer's output without storing
+        intermediate state. Used for inference (e.g. rendering the decision
+        boundary) so it is safe to call concurrently with training.
+        """
+        return self._activate(self._compute(input))
+
     def forward(self, input: Vector) -> Vector:
         """
         Run the input through this layer and return the output.
@@ -45,10 +53,8 @@ class Layer:
         function if one was provided. Stores input and z for use in backward().
         """
         self._input = input
-        self._last_z = (self.weights * input) + self.bias
-        if self._activation:
-            return Vector([self._activation(x) for x in self._last_z])
-        return self._last_z
+        self._last_z = self._compute(input)
+        return self._activate(self._last_z)
 
     def backward(self, grad_output: Vector, learning_rate: float) -> Vector:
         """
@@ -73,3 +79,18 @@ class Layer:
         self.weights = self.weights - (self._grad_weights * learning_rate)
         self.bias = self.bias - (self._grad_bias * learning_rate)
         return grad_input
+    
+    def _compute(self, input: Vector) -> Vector:
+        """
+        Compute the pre-activation z = W·x + b. Returns the raw weighted sum
+        without applying the activation function — callers apply activation
+        themselves so backward() can rely on _last_z holding the true z value
+        that activation_derivative expects.
+        """
+        return (self.weights * input) + self.bias
+
+    def _activate(self, z: Vector) -> Vector:
+        """Apply the activation function element-wise, or pass z through unchanged if no activation is set."""
+        if self._activation:
+            return Vector([self._activation(x) for x in z])
+        return z

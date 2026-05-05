@@ -28,7 +28,9 @@ def test_layer_forward_applies_activation():
 
 def test_layer_backward_returns_grad_input():
     l = _get_layer()
+    input = Vector([1.0, 1.0])
     grad_output = Vector([1.0, 1.0])
+    l.forward(input)
     grad_input = l.backward(grad_output, learning_rate)
     assert grad_output == grad_input
 
@@ -42,9 +44,18 @@ def test_layer_backward_stores_grad_weights():
 
 def test_layer_backward_stores_grad_bias():
     l = _get_layer()
+    input = Vector([1.0, 1.0])
     grad_output = Vector([5.0, 5.0])
+    l.forward(input)
     _ = l.backward(grad_output, learning_rate)
     assert l._grad_bias == Vector([5.0, 5.0])
+
+def test_predict_doesnt_mutate_input_and_last_z():
+    l = _get_layer()
+    l.predict(Vector([3.0, 5.0]))
+    l.predict(Vector([1.0, 2.0]))
+    assert l._input is None
+    assert l._last_z is None
 
 def _get_layer(activation: Callable[[float], float] | None = None) -> Layer:
     l = Layer(input_size=2, output_size=2, activation=activation)

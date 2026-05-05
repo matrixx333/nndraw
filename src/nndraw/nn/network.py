@@ -42,7 +42,7 @@ class Network:
         """
         result = input
         for l in self._layers:
-            result = l.forward(result)
+            result = l.predict(result)
         return result
     
     def train(
@@ -59,8 +59,18 @@ class Network:
         order — each layer updates its own weights and passes the gradient
         further back.
         """
-        output = self.predict(input)
-        grad = Vector([o - t for o, t in zip(output, target)])
+        result = self._forward(input)
+        grad = Vector([o - t for o, t in zip(result, target)])
         for l in reversed(self._layers):
             grad = l.backward(grad, learning_rate)
-
+    
+    def _forward(self, input: Vector) -> Vector:
+        """
+        Caching forward pass used by train(). Each layer stores its input and
+        pre-activation so the subsequent backward() call can compute gradients.
+        Mirrors predict(), but with mutation — only call from the training thread.
+        """
+        result = input
+        for l in self._layers:
+            result = l.forward(result)
+        return result

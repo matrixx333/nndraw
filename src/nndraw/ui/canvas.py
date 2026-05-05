@@ -133,7 +133,7 @@ class Canvas:
     def _training_loop(self) -> None:
         while True:
             self._train()
-            time.sleep(0)
+            time.sleep(0.001)
 
     def _load_points(self) -> None:
         points = self._point_store.get_all()

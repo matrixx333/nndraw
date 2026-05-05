@@ -23,5 +23,12 @@ def test_network_train_reduces_loss():
     final_sum = mean_squared_error(final_output, target)    
     assert final_sum < initial_sum
 
+def test_network_predict_does_not_mutate_layer_state():
+    n = Network(layer_sizes)
+    n.predict(Vector([0.5, 0.5]))
+    for l in n._layers:
+        assert l._input is None
+        assert l._last_z is None
+
 def mean_squared_error(output: Vector, target: Vector) -> float:
     return sum((o - t) ** 2 for o, t in zip(output, target))
