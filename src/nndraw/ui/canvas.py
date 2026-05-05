@@ -2,16 +2,19 @@ from typing import Any
 
 import pygame
 import threading
+import time
 
 from nndraw.linalg.vector import Vector
 from nndraw.nn.network import Network
 from nndraw.nn.activations import sigmoid, sigmoid_derivative
 from nndraw.ui.config import CanvasConfig
+from nndraw.db.point_store import PointStore
 
 _config = CanvasConfig()
 
 class Canvas:
     def __init__(self):
+        self._point_store = PointStore()
         self._points = []
         self._network = Network(
             [2, _config.hidden_size, 1],
@@ -29,6 +32,7 @@ class Canvas:
         clock = pygame.time.Clock()
         thread = threading.Thread(target=self._training_loop, daemon=True)
         thread.start()
+        threading.Thread(target=self._load_points, daemon=True).start()
         running = True
 
         while running:
@@ -74,6 +78,7 @@ class Canvas:
             label = 0
             normalized_input = self._normalize_input(x, y)
             v = Vector(normalized_input);
+            self._point_store.add_point(v, label)
             with self._lock:
                 self._points.append((v, label));
         elif is_right_click:
@@ -82,6 +87,7 @@ class Canvas:
             label = 1
             normalized_input = self._normalize_input(x, y)
             v = Vector(normalized_input);
+            self._point_store.add_point(v, label)
             with self._lock:
                 self._points.append((v, label));
 
@@ -127,3 +133,9 @@ class Canvas:
     def _training_loop(self) -> None:
         while True:
             self._train()
+            time.sleep(0)
+
+    def _load_points(self) -> None:
+        points = self._point_store.get_all()
+        with self._lock:
+            self._points.extend(points)

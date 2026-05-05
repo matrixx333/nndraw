@@ -41,7 +41,7 @@ class PointStore:
             points=points
         )
     
-    def get_all(self) -> list[Vector]: 
+    def get_all(self) -> list[tuple[Vector, int]]: 
         all_records: list[Record] = []
         all_vectors: list[Vector] = []
         scroll_offset = None
@@ -59,9 +59,12 @@ class PointStore:
             if offset is None: 
                 break
 
+            scroll_offset = offset
+
         for r in all_records:
+            label = r.payload['label']
             v = Vector(cast(list[float], r.vector))
-            all_vectors.append(v)
+            all_vectors.append((v, label))
 
         return all_vectors
     
