@@ -4,6 +4,9 @@ An interactive neural network decision boundary visualizer — built from scratc
 
 This project intentionally avoids third-party math libraries. Every vector operation, matrix multiplication, and dot product is hand-rolled to build real intuition for the linear algebra powering neural networks. The UI renders in real time using Pygame, and Qdrant stores the training points so you can query and explore them as vectors.
 
+<img width="1598" height="927" alt="image" src="https://github.com/user-attachments/assets/d6a931e7-bffa-45b6-bdbd-b5c9f0e1d8ee" />
+
+
 ## What's inside
 
 - **`linalg/`** — A custom linear algebra library: vectors, matrices, and the math primitives that underpin everything else. No NumPy, no SciPy.
