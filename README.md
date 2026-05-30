@@ -4,8 +4,7 @@ An interactive neural network decision boundary visualizer — built from scratc
 
 This project intentionally avoids third-party math libraries. Every vector operation, matrix multiplication, and dot product is hand-rolled to build real intuition for the linear algebra powering neural networks. The UI renders in real time using Pygame, and Qdrant stores the training points so you can query and explore them as vectors.
 
-<img width="100%" height="373" alt="nndraw" src="https://github.com/user-attachments/assets/2db8b066-8a7b-4b24-bf7e-82fbdc894183" />
-
+<img width="1598" height="928" alt="image" src="https://github.com/user-attachments/assets/d9118caf-1742-4b76-85cf-a15e23ee0ffc" />
 
 ## What's inside
 
