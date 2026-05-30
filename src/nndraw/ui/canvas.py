@@ -5,12 +5,26 @@ import threading
 import time
 
 from nndraw.linalg.vector import Vector
+from nndraw.nn.activation import Activation
 from nndraw.nn.network import Network
-from nndraw.nn.activations import sigmoid, sigmoid_derivative
+from nndraw.nn.activations import (
+    sigmoid, 
+    sigmoid_derivative
+)
 from nndraw.ui.config import CanvasConfig
 from nndraw.db.point_store import PointStore
+from nndraw.ui.input_handler import parse_event
+from nndraw.ui.coords import normalize, denormalize
+from nndraw.ui.label import Label
 
 _config = CanvasConfig()
+
+LABEL_COLORS = {
+    Label.PURPLE: _config.purple,
+    Label.GREEN: _config.green
+}
+
+SIGMOID = Activation(sigmoid, sigmoid_derivative)
 
 class Canvas:
     def __init__(self):
@@ -18,8 +32,7 @@ class Canvas:
         self._points = []
         self._network = Network(
             [2, _config.hidden_size, 1],
-            sigmoid, 
-            sigmoid_derivative
+            SIGMOID
         )
         self._lock = threading.Lock()
 
@@ -58,7 +71,7 @@ class Canvas:
     def _draw_background(self, screen: pygame.Surface) -> None:
         for x in range(0, _config.width, _config.grid_size):
             for y in range(0, _config.height, _config.grid_size):
-                normalized_input = self._normalize_input(x, y)
+                normalized_input = normalize(x, y)
                 output = self._network.predict(Vector(normalized_input))
                 color = self._lerp_color(output)
                 pygame.draw.rect(
@@ -68,42 +81,23 @@ class Canvas:
                 )
 
     def _add_vector(self, event: pygame.Event) -> None:
-        label = None
-        is_mouse_btn_down = event.type == pygame.MOUSEBUTTONDOWN
-        is_left_click = is_mouse_btn_down and event.button == _config.left_btn
-        is_right_click = is_mouse_btn_down and event.button == _config.right_btn
-        if is_left_click:
-            print(event.pos)
-            x, y = event.pos
-            label = 0
-            normalized_input = self._normalize_input(x, y)
+        request = parse_event(event)
+        if request is not None:
+            normalized_input = normalize(request.x, request.y)
             v = Vector(normalized_input);
-            self._point_store.add_point(v, label)
+            self._point_store.add_point(v, request.label)
             with self._lock:
-                self._points.append((v, label));
-        elif is_right_click:
-            print(event.pos)
-            x, y = event.pos
-            label = 1
-            normalized_input = self._normalize_input(x, y)
-            v = Vector(normalized_input);
-            self._point_store.add_point(v, label)
-            with self._lock:
-                self._points.append((v, label));
+                self._points.append((v, request.label));
 
     def _draw_circle(
             self, 
             surface: pygame.Surface,
-            point: tuple[Vector, int]
+            point: tuple[Vector, Label]
         ) -> None:
         v, label = point
         x, y = v
-        color = ()
-        if label == 0:
-            color = _config.purple
-        elif label == 1:
-            color = _config.green
-        x, y = self._denormalize_input(v)
+        color = LABEL_COLORS[label]
+        x, y = denormalize(v)
         pygame.draw.circle(surface, color, (x, y), 6)
         pygame.draw.circle(surface, (255, 255, 255), (x, y), 6, 2)
 
@@ -112,16 +106,6 @@ class Canvas:
         g = _config.purple[1] + (_config.green[1] - _config.purple[1]) * output[0]
         b = _config.purple[2] + (_config.green[2] - _config.purple[2]) * output[0]
         return (int(r), int(g), int(b))
-    
-    def _normalize_input(self, x: int, y: int) -> list[float]:
-        nx = x / _config.width
-        ny = y / _config.height
-        return [nx, ny]
-    
-    def _denormalize_input(self, input: Vector) -> tuple[float, float]:
-        x = input[0] * _config.width
-        y = input[1] * _config.height
-        return (x, y)
 
     def _train(self) -> None:
         with self._lock:
@@ -137,5 +121,6 @@ class Canvas:
 
     def _load_points(self) -> None:
         points = self._point_store.get_all()
+        points = [(v, Label(label)) for v, label in points]
         with self._lock:
             self._points.extend(points)

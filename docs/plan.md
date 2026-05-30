@@ -126,7 +126,7 @@ This project is designed to grow. After the MVP, each expansion introduces new P
 | MVP | Basics | 2-layer network, 2D canvas, Qdrant point storage |
 | v1.1 | Python dataclasses & enums | Refactor config and hyperparameters |
 | v1.2 | LA: matrix inverse & determinants | Add analytical weight solutions, visualize matrix properties |
-| v1.3 | More activation functions | Tanh, Leaky ReLU — compare convergence visually |
+| v1.3 | More activation functions | Tanh, Leaky ReLU — compare convergence visually (see Lessons Learned: per-layer activations) |
 | v1.4 | Python async/threading | Background training thread, smooth animation |
 | v1.5 | Qdrant snapshots & persistence | Save/load sessions; Qdrant collections on disk |
 | v1.6 | Multi-class classification | Add more color classes; softmax output layer |
@@ -138,6 +138,53 @@ This project is designed to grow. After the MVP, each expansion introduces new P
 | v2.2 | Genomics domain | Classify gene sequences or CRISPR guide RNA efficiency; DNA/RNA features as vectors — same network, new data source |
 | v2.3 | Python data pipeline | `csv` / `json` module, data normalization, train/test split — proper ML workflow |
 | v2.4 | Qdrant as data warehouse | Persist domain datasets in Qdrant collections; switch datasets at runtime |
+
+---
+
+## Lessons Learned
+
+Insights discovered through experimentation, captured so they aren't lost between sessions.
+
+### Activation functions belong to layers, not to the whole network
+
+**What we uncovered (while reaching toward v1.3):** Swapping the network's single
+activation from sigmoid to tanh caused a `ValueError` in `_lerp_color` /
+`pygame.draw.rect` — "color element must be in range [0, 255]".
+
+**Why it happened — the ML concept:**
+- An activation's correct choice depends on the *layer's job*, not personal preference.
+- **Hidden layers** transform features for the *next* layer, which doesn't care about
+  output range. They want activations that let gradients flow well: **tanh** (zero-centered,
+  range −1..1) or **relu**.
+- The **output layer** produces the *answer*, which must mean something to the consumer.
+  For binary classification that's a probability → must be **0..1** → **sigmoid**.
+- `_lerp_color` assumes the network output is a 0..1 probability (it blends purple→green
+  by that value). tanh on the *output* layer can return negatives → blend factor goes
+  negative → RGB component drops below 0 → pygame rejects it.
+- Correct design: **tanh (or relu) on hidden layers, sigmoid on the output layer.**
+
+**Why it happened — the design/code limitation it exposed:**
+- `Network.__init__` currently takes ONE activation and forces it on EVERY layer
+  (see `nn/network.py` — the loop hands the same activation to each `Layer`).
+- There is no way to express "tanh on hidden, sigmoid on output." The all-or-nothing
+  interface is the real bug the crash revealed; the layer math itself is correct.
+
+**The refactor this motivates (next time, TDD in `nn/` core):**
+1. Introduce an `Activation` value object (frozen dataclass bundling `fn` + `derivative`)
+   in `nn/` — fixes the "two loose functions must stay paired" coupling, and makes
+   mismatched pairs (e.g. sigmoid fn + tanh derivative) unrepresentable. Define
+   `SIGMOID`, `TANH`, `RELU`, `LEAKY_RELU` as constants.
+2. Change `Network` to accept a **list of activations, one per layer**, e.g.
+   `Network([2, hidden, 1], [TANH, SIGMOID])`, and hand each `Activation` to its `Layer`.
+   This is what enables tanh-hidden / sigmoid-output and properly fixes the crash.
+   - Open TDD question to resume on: *what is the simplest test that forces `Network` to
+     apply a different activation to each layer — how do you observe, from outside, that
+     layer 0 used tanh and layer 1 used sigmoid?*
+
+**Meta-lesson:** the plan named the *milestone* (v1.3 "compare activations") but not the
+*design problem* it forces. Running the code and hitting the crash is what surfaced the
+per-layer-activation need — concepts emerging from contact with the system, exactly as
+this project's pedagogy intends.
 
 ---
 

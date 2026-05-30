@@ -1,6 +1,7 @@
 from typing import Callable
 
 from nndraw.linalg.vector import Vector
+from nndraw.nn.activation import Activation
 from nndraw.nn.layer import Layer
 
 class Network:
@@ -19,8 +20,7 @@ class Network:
     def __init__(
             self,
             layer_sizes: list[int],
-            activation: Callable[[float], float] | None = None,
-            activation_derivative: Callable[[float], float] | None = None
+            activation: Activation
         ):
         layer_pairs = zip(layer_sizes, layer_sizes[1:])
         self._layers: list[Layer] = []
@@ -28,8 +28,8 @@ class Network:
             l = Layer(
                 input_size,
                 output_size,
-                activation,
-                activation_derivative
+                activation.fn,
+                activation.derivative
             )
             self._layers.append(l)
 

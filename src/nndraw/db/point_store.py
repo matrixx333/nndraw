@@ -84,8 +84,9 @@ class PointStore:
         )
 
         for r in search_result.points:
-            if r.payload is not None:
-                label = r.payload["label"]
+            if r.payload is None:
+                raise ValueError(f'point {r.id} has no payload')
+            label = r.payload["label"]
             v = Vector(cast(list[float], r.vector))
             results.append((v, label))
 
